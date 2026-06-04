@@ -158,9 +158,13 @@ router.get("/branches/:id/details", async (req, res) => {
     
     let saleQuery: any = { branchId };
     if (from && to) {
+      const fromDate = new Date(from as string);
+      const toDate = new Date(to as string);
+      toDate.setUTCHours(23, 59, 59, 999); // Set to end of day in UTC
+
       saleQuery.createdAt = {
-        $gte: new Date(from as string),
-        $lte: new Date(to as string)
+        $gte: fromDate,
+        $lte: toDate
       };
     }
     
@@ -221,8 +225,14 @@ router.get("/reports/transfers", async (req, res) => {
     if (branchId) query.branchId = branchId;
     if (from || to) {
       query.createdAt = {};
-      if (from) query.createdAt.$gte = new Date(from as string);
-      if (to) query.createdAt.$lte = new Date(to as string);
+      if (from) {
+        query.createdAt.$gte = new Date(from as string);
+      }
+      if (to) {
+        const toDate = new Date(to as string);
+        toDate.setUTCHours(23, 59, 59, 999);
+        query.createdAt.$lte = toDate;
+      }
     }
     const transfers = await StockTransfer.find(query).populate('branchId').populate('globalProductId').sort({ createdAt: -1 });
     res.json(transfers);

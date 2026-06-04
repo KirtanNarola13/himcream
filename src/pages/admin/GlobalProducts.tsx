@@ -398,8 +398,36 @@ export default function AdminGlobalProducts() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold tracking-tight text-slate-700 mb-1">Image URL</label>
-                  <input type="url" value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} className="w-full border-slate-200 rounded-lg px-3 py-2 border focus:border-blue-500 focus:ring-2 focus:ring-blue-200" />
+                  <label className="block text-sm font-bold tracking-tight text-slate-700 mb-1">Product Image</label>
+                  <div className="flex items-center gap-4">
+                    {formData.imageUrl && (
+                      <div className="w-16 h-16 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden shrink-0">
+                        <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                             if (file.size > 5 * 1024 * 1024) {
+                               toast.error("Image must be smaller than 5MB");
+                               return;
+                             }
+                             const reader = new FileReader();
+                             reader.onloadend = () => {
+                               setFormData({...formData, imageUrl: reader.result as string});
+                             };
+                             reader.readAsDataURL(file);
+                          }
+                        }} 
+                        className="w-full border-slate-200 rounded-lg px-3 py-2 border focus:border-blue-500 focus:ring-2 focus:ring-blue-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 text-sm" 
+                      />
+                      <p className="text-xs text-slate-500 mt-1">Upload an image file (Max 5MB).</p>
+                    </div>
+                  </div>
                 </div>
               </form>
             </div>

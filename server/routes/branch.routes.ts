@@ -167,9 +167,13 @@ router.get("/sales/:branchId", async (req: AuthRequest, res) => {
     let query: any = { branchId };
     
     if (from && to) {
+      const fromDate = new Date(from as string);
+      const toDate = new Date(to as string);
+      toDate.setUTCHours(23, 59, 59, 999);
+      
       query.createdAt = {
-        $gte: new Date(from as string),
-        $lte: new Date(to as string)
+        $gte: fromDate,
+        $lte: toDate
       };
     }
     
